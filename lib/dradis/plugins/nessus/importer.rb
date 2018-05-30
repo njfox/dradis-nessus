@@ -69,8 +69,12 @@ module Dradis::Plugins::Nessus
     def process_report_host(xml_host)
 
       # 1. Create host node
-      host_label = xml_host.attributes['name'].value
-      host_label += " (#{xml_host.attributes['fqdn'].value})" if xml_host.attributes['fqdn']
+      n = ::Nessus::Host.new(xml_host)
+      if n.ip
+        host_label = "#{n.ip}"
+      else
+        host_label = xml_host.attributes['name'].value
+      end
 
       host_node = content_service.create_node(label: host_label, type: :host)
       logger.info{ "\tHost: #{host_label}" }
